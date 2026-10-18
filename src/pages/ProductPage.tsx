@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Check, ChevronRight, ShoppingBag } from 'lucide-react'
+import { Check, ChevronRight, Pencil, ShoppingBag } from 'lucide-react'
 import { ProductGallery } from '@/components/product/ProductGallery'
 import { VariantSelector } from '@/components/product/VariantSelector'
 import { ShippingCalculator } from '@/components/product/ShippingCalculator'
@@ -19,7 +19,7 @@ export default function ProductPage() {
   const { id } = useParams()
   const { data: product, isLoading, isError } = useProduct(id)
   const { data: reviews } = useProductReviews(id)
-  const { isAuthenticated, isClient } = useAuth()
+  const { isAuthenticated, isClient, isAdmin } = useAuth()
   const { add } = useCartMutations()
   const navigate = useNavigate()
   const location = useLocation()
@@ -76,7 +76,10 @@ export default function ProductPage() {
 
         <div className="space-y-6">
           <div className="space-y-3">
-            <div className="flex flex-wrap gap-2"><Badge>{GENDER_LABEL[product.gender] ?? product.gender}</Badge><Badge className="bg-white ring-1 ring-brand-200">{product.category.category_name}</Badge></div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge>{GENDER_LABEL[product.gender] ?? product.gender}</Badge><Badge className="bg-white ring-1 ring-brand-200">{product.category.category_name}</Badge>
+              {isAdmin && <ButtonLink to={`/painel/produtos/${product.product_id}`} size="sm" className="ml-auto"><Pencil className="size-4" /> Editar</ButtonLink>}
+            </div>
             <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">{product.product_name}</h1>
             <div>
               <p className="text-3xl font-extrabold text-brand-800">{price}</p>
