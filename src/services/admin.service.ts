@@ -86,6 +86,8 @@ export const adminCampaigns = {
     api.post<CampaignImage>(`/campaigns/${id}/images`, form({ image }), { params: { is_cover: isCover } }).then((r) => r.data),
   deleteImage: (imageId: string) => api.delete<Message>(`/campaigns/images/${imageId}`).then((r) => r.data),
   setCover: (imageId: string) => api.post<CampaignImage>(`/campaigns/images/${imageId}/set-cover`).then((r) => r.data),
+  updateImage: (imageId: string, body: { fit?: 'cover' | 'contain'; focus_x?: number; focus_y?: number; zoom?: number }) =>
+    api.patch<CampaignImage>(`/campaigns/images/${imageId}`, body).then((r) => r.data),
 }
 
 export const adminContacts = {

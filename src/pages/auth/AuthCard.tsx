@@ -1,29 +1,29 @@
 import type { ReactNode } from 'react'
+import heroImage from '@/assets/auth/auth-hero.jpg'
 import { Heart, Package, ShieldCheck, Truck } from 'lucide-react'
 
 const perks = [
-  { icon: Package, text: 'Acompanhe seus pedidos em tempo real' },
-  { icon: Truck, text: 'Salve endereços e compre em poucos cliques' },
-  { icon: ShieldCheck, text: 'Dados protegidos de acordo com a LGPD' },
-  { icon: Heart, text: 'Novidades e ofertas da Gama Fashion' },
+  { icon: Package, text: 'Acompanhe seus pedidos' },
+  { icon: Truck, text: 'Compre em poucos cliques' },
+  { icon: ShieldCheck, text: 'Dados protegidos (LGPD)' },
+  { icon: Heart, text: 'Novidades e ofertas' },
 ]
 
 /** Casca das telas de autenticação: renderizada dentro do MainLayout (com cabeçalho e rodapé). */
 export function AuthCard({ title, subtitle, children, footer }: { title: string; subtitle?: string; children: ReactNode; footer?: ReactNode }) {
   return (
     <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-2 lg:py-16">
-      <aside className="relative hidden flex-col justify-between overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand-950 via-brand-900 to-brand-700 p-12 text-white lg:flex">
-        <div className="absolute -right-24 -top-24 size-80 rounded-full bg-brand-500/30 blur-3xl" />
-        <div className="absolute -bottom-24 -left-10 size-72 rounded-full bg-white/10 blur-3xl" />
+      <aside className="relative hidden min-h-[34rem] flex-col justify-between overflow-hidden rounded-[2.5rem] bg-brand-950 p-10 text-white lg:flex">
+        <img src={heroImage} alt="" width={1200} height={1803} decoding="async" className="absolute inset-0 size-full object-cover object-top" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-950/80 via-brand-950/10 to-brand-950/90" />
         <div className="relative space-y-4">
           <span className="inline-block rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] backdrop-blur">Gama Fashion</span>
-          <h2 className="text-4xl font-extrabold leading-tight">Treine com estilo. Vá além.</h2>
-          <p className="max-w-sm text-brand-100">Sua conta deixa a compra mais rápida e o acompanhamento dos pedidos mais simples.</p>
+          <h2 className="max-w-xs text-4xl font-extrabold leading-tight">Treine com estilo. Vá além.</h2>
         </div>
-        <ul className="relative space-y-3">
+        <ul className="relative grid grid-cols-2 gap-2.5">
           {perks.map(({ icon: Icon, text }) => (
-            <li key={text} className="flex items-center gap-3 rounded-full bg-white/10 py-2.5 pl-2.5 pr-5 text-sm backdrop-blur">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-brand-700"><Icon className="size-4" /></span>{text}
+            <li key={text} className="flex items-center gap-2.5 rounded-full bg-white/15 py-2 pl-2 pr-4 text-xs font-semibold backdrop-blur-md">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-brand-700"><Icon className="size-4" /></span>{text}
             </li>
           ))}
         </ul>

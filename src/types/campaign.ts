@@ -17,6 +17,11 @@ export interface CampaignImage {
   image_url: string
   is_cover: boolean
   display_order: number
+  /** Ajustes de exibição (opcionais enquanto o back não tiver os campos). */
+  fit?: 'cover' | 'contain'
+  focus_x?: number
+  focus_y?: number
+  zoom?: number
 }
 
 export interface ContactIn {

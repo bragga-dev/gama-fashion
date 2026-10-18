@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ImageIcon, Pencil, Plus, Power, Star, Trash2, X } from 'lucide-react'
+import { ImageIcon, Pencil, Plus, Power, SlidersHorizontal, Star, Trash2, X } from 'lucide-react'
 import { Card, Modal, PageHeader, Pill } from '@/components/admin/AdminUI'
+import { ImageAdjustModal } from '@/components/admin/ImageAdjustModal'
 import { Button, IconButton } from '@/components/ui/Button'
 import { Input, Textarea } from '@/components/ui/Field'
 import { Alert, PageLoader } from '@/components/ui/misc'
@@ -10,7 +11,7 @@ import { cn } from '@/lib/cn'
 import { getErrorMessage } from '@/lib/errors'
 import { formatDate } from '@/lib/format'
 import { adminCampaigns } from '@/services/admin.service'
-import type { Campaign } from '@/types/campaign'
+import type { Campaign, CampaignImage } from '@/types/campaign'
 
 const toLocal = (iso?: string | null) => (iso ? new Date(new Date(iso).getTime() - new Date(iso).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '')
 const toIso = (v: string) => (v ? new Date(v).toISOString() : null)
@@ -63,6 +64,7 @@ function CampaignForm({ campaign, onClose }: { campaign: Campaign | null; onClos
 function ImagesModal({ campaign, onClose }: { campaign: Campaign; onClose: () => void }) {
   const qc = useQueryClient()
   const id = campaign.campaign_id
+  const [adjusting, setAdjusting] = useState<CampaignImage | null>(null)
   const confirm = useConfirm()
   const { data, isLoading } = useQuery({ queryKey: ['admin', 'campaign-images', id], queryFn: () => adminCampaigns.images(id) })
   const refresh = () => { void qc.invalidateQueries({ queryKey: ['admin', 'campaign-images', id] }); void qc.invalidateQueries({ queryKey: ['campaigns'] }) }
@@ -81,11 +83,15 @@ function ImagesModal({ campaign, onClose }: { campaign: Campaign; onClose: () =>
             <li key={img.campaign_mage_id} className={cn('relative aspect-video overflow-hidden rounded-3xl border-2', img.is_cover ? 'border-brand-700' : 'border-brand-100')}>
               <img src={img.image_url} alt="" className="size-full object-cover" />
               {img.is_cover && <span className="absolute left-2 top-2"><Pill>Capa</Pill></span>}
-              <div className="absolute inset-x-2 bottom-2 flex justify-between">
-                <button aria-label="Definir como capa" onClick={() => cover.mutate(img.campaign_mage_id)} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-brand-700 shadow-card"><Star className="size-4" /></button>
+              <div className="absolute inset-x-2 bottom-2 flex items-center justify-between">
+                <div className="flex gap-1.5">
+                  <button aria-label="Definir como capa" title="Definir como capa" onClick={() => cover.mutate(img.campaign_mage_id)} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-brand-700 shadow-card"><Star className="size-4" /></button>
+                  <button aria-label="Ajustar zoom e posição" title="Ajustar zoom e posição" onClick={() => setAdjusting(img)} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-brand-700 shadow-card"><SlidersHorizontal className="size-4" /></button>
+                </div>
                 <button aria-label="Excluir" onClick={async () => { if (await confirm('Excluir esta imagem?')) remove.mutate(img.campaign_mage_id) }} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-red-600 shadow-card"><Trash2 className="size-4" /></button>
               </div>
             </li>))}</ul>)}
+        {adjusting && <ImageAdjustModal image={adjusting} onClose={() => setAdjusting(null)} />}
       </div>
     </Modal>
   )

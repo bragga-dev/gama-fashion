@@ -3,12 +3,15 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ButtonLink, IconButton } from '@/components/ui/Button'
 import { Skeleton } from '@/components/ui/misc'
 import { useRunningCampaigns } from '@/hooks/useCatalog'
+import { BannerImage } from './BannerImage'
 import { cn } from '@/lib/cn'
+import { adjustOf, DEFAULT_ADJUST, type ImageAdjust } from '@/lib/image-fit'
 
-interface Slide { id: string; title: string; text?: string | null; image?: string }
+interface Slide { id: string; title: string; text?: string | null; image?: string; adjust: ImageAdjust }
 
 const FALLBACK: Slide = {
   id: 'default',
+  adjust: DEFAULT_ADJUST,
   title: 'Treine com estilo. Vá além.',
   text: 'Moda fitness feminina e masculina pensada para acompanhar o seu ritmo.',
 }
@@ -22,7 +25,7 @@ export function HeroCarousel() {
   const slides: Slide[] = (campaigns ?? []).flatMap((c) =>
     [...c.images]
       .sort((a, b) => Number(b.is_cover) - Number(a.is_cover) || a.display_order - b.display_order)
-      .map((img) => ({ id: img.campaign_mage_id, title: c.title, text: c.description, image: img.image_url })),
+      .map((img) => ({ id: img.campaign_mage_id, title: c.title, text: c.description, image: img.image_url, adjust: adjustOf(img) })),
   )
   const list = slides.length ? slides : [FALLBACK]
   const total = list.length
@@ -70,8 +73,8 @@ export function HeroCarousel() {
         >
           {list.map((s, i) => (
             <div key={s.id} role="group" aria-roledescription="slide" aria-label={`${i + 1} de ${total}`} aria-hidden={i !== current}
-              className="relative aspect-[4/3] w-full shrink-0 bg-gradient-to-br from-brand-950 via-brand-900 to-brand-700 sm:aspect-[16/9] lg:aspect-[21/9]">
-              {s.image && <img src={s.image} alt="" draggable={false} loading={i === 0 ? 'eager' : 'lazy'} className="absolute inset-0 size-full object-cover" />}
+              className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-700 sm:aspect-[16/9] lg:aspect-[21/9]">
+              {s.image && <BannerImage src={s.image} adjust={s.adjust} eager={i === 0} />}
               <div className="absolute inset-0 bg-gradient-to-r from-brand-950/85 via-brand-950/40 to-transparent" />
               {!s.image && <div className="absolute -right-20 -top-20 size-80 rounded-full bg-brand-500/30 blur-3xl" />}
               <div className="absolute inset-0">
