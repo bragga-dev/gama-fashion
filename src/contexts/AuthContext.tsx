@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useRef, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { refreshAccessToken } from '@/lib/api'
 import { tokenStore } from '@/lib/token-store'
@@ -23,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [me, setMe] = useState<Me | null>(null)
   const [isLoading, setLoading] = useState(true)
   const qc = useQueryClient()
+  const channel = useRef<BroadcastChannel | null>(null)
 
   const clearLocal = useCallback(() => {
     tokenStore.clear()
@@ -50,6 +51,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { alive = false }
   }, [clearLocal])
 
+  // Sincroniza login/logout entre abas (o canal não carrega token, só o aviso).
+  useEffect(() => {
+    if (typeof BroadcastChannel === 'undefined') return
+    const ch = new BroadcastChannel('gama-fashion-auth')
+    channel.current = ch
+    ch.onmessage = async (ev: MessageEvent<'logout' | 'login'>) => {
+      if (ev.data === 'logout') clearLocal()
+      if (ev.data === 'login') {
+        try { await refreshAccessToken(); setMe(await authService.me()) } catch { /* segue deslogado */ }
+      }
+    }
+    return () => { ch.close(); channel.current = null }
+  }, [clearLocal])
+
   // Refresh falhou durante uma requisição (401/403): limpa o estado local.
   useEffect(() => tokenStore.onSessionExpired(clearLocal), [clearLocal])
 
@@ -57,12 +72,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     tokenStore.set(access)
     const data = await authService.me()
     setMe(data)
+    channel.current?.postMessage('login')
     return data
   }, [])
 
   const signOut = useCallback(async () => {
     try { await authService.logout() } catch { /* a sessão local é descartada de qualquer forma */ }
     clearLocal()
+    channel.current?.postMessage('logout')
   }, [clearLocal])
 
   const reload = useCallback(async () => {

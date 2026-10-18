@@ -38,6 +38,8 @@ export function Footer() {
             <li><Link className={link} to="/painel/perfil">Meus dados</Link></li>
             <li><Link className={link} to="/painel/enderecos">Endereços</Link></li>
             <li><Link className={link} to="/contato">Fale conosco</Link></li>
+            <li><Link className={link} to="/termos">Termos de Uso</Link></li>
+            <li><Link className={link} to="/privacidade">Política de Privacidade</Link></li>
           </ul>
         </div>
         <div>

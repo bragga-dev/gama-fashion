@@ -8,6 +8,7 @@ import { Alert, PageLoader } from '@/components/ui/misc'
 import { getErrorMessage } from '@/lib/errors'
 import { formatDate, lineTitle, variantInfo } from '@/lib/format'
 import { formatBRL } from '@/lib/money'
+import { safeExternalUrl } from '@/lib/safe-url'
 import { adminOrders } from '@/services/admin.service'
 
 export default function OrderAdminDetailPage() {
@@ -57,7 +58,7 @@ export default function OrderAdminDetailPage() {
               {o.shipped_at && <div className="flex justify-between"><dt>Enviado em</dt><dd>{formatDate(o.shipped_at)}</dd></div>}
               {o.delivered_at && <div className="flex justify-between"><dt>Entregue em</dt><dd>{formatDate(o.delivered_at)}</dd></div>}
             </dl>
-            {o.shipping_label_url && <a href={o.shipping_label_url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline"><ExternalLink className="size-4" /> Abrir etiqueta</a>}
+            {safeExternalUrl(o.shipping_label_url) && <a href={safeExternalUrl(o.shipping_label_url)!} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline"><ExternalLink className="size-4" /> Abrir etiqueta</a>}
           </Card>
           <Card className="space-y-3"><h2 className="font-bold">Ações</h2>
             <Button className="w-full" disabled={!paid || o.shipping_status !== 'pending'} loading={label.isPending}

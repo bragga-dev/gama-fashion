@@ -6,6 +6,7 @@ import { EmptyState, PageLoader, Pagination } from '@/components/ui/misc'
 import { useNotificationMutations, useNotifications } from '@/hooks/useAccount'
 import { cn } from '@/lib/cn'
 import { formatDate } from '@/lib/format'
+import { safeInternalPath } from '@/lib/safe-url'
 
 export default function NotificationsPage() {
   const [page, setPage] = useState(1)
@@ -24,7 +25,7 @@ export default function NotificationsPage() {
         <ul className="space-y-2">
           {data.items.map((n) => (
             <li key={n.notification_id} className={cn('flex items-start gap-3 rounded-3xl border p-4', n.is_read ? 'border-brand-100' : 'border-brand-300 bg-brand-50')}>
-              <button className="min-w-0 flex-1 text-left" onClick={() => { if (!n.is_read) read.mutate(n.notification_id); if (n.action_url) navigate(n.action_url) }}>
+              <button className="min-w-0 flex-1 text-left" onClick={() => { if (!n.is_read) read.mutate(n.notification_id); const path = safeInternalPath(n.action_url); if (path) navigate(path) }}>
                 <p className="font-bold">{n.title}</p><p className="text-sm text-brand-950/70">{n.body}</p>
                 <p className="mt-1 text-xs text-brand-950/50">{formatDate(n.created_at, true)}</p>
               </button>

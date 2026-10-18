@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useNotificationMutations, useNotifications, useUnreadCount } from '@/hooks/useAccount'
 import { timeAgo } from '@/lib/format'
 import { cn } from '@/lib/cn'
+import { safeInternalPath } from '@/lib/safe-url'
 import type { AppNotification } from '@/types/notification'
 
 export function NotificationBell() {
@@ -31,7 +32,8 @@ export function NotificationBell() {
     if (!n.is_read) read.mutate(n.notification_id)
     setOpen(false)
     // action_url é sempre um caminho relativo (o back descarta qualquer URL absoluta).
-    if (n.action_url) navigate(n.action_url)
+    const path = safeInternalPath(n.action_url)
+    if (path) navigate(path)
   }
 
   return (

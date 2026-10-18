@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { GoogleLogin } from '@react-oauth/google'
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Field'
 import { Alert, Spinner } from '@/components/ui/misc'
@@ -46,12 +47,13 @@ export function GoogleSection({ onSuccess, termsAccepted = false }: Props) {
   }
 
   return (
+    <GoogleOAuthProvider clientId={env.googleClientId}>
     <div className="space-y-4">
       <OrDivider />
       {pendingToken ? (
         <div className="space-y-4 rounded-3xl bg-brand-50 p-5">
           <p className="text-sm font-semibold">Quase lá! Para criar sua conta com o Google, confirme:</p>
-          <Checkbox checked={terms} onChange={(e) => setTerms(e.target.checked)} label="Li e aceito os Termos de Uso e a Política de Privacidade." />
+          <Checkbox checked={terms} onChange={(e) => setTerms(e.target.checked)} label={<>Li e aceito os <Link to="/termos" target="_blank" className="font-semibold text-brand-700 underline">Termos de Uso</Link> e a <Link to="/privacidade" target="_blank" className="font-semibold text-brand-700 underline">Política de Privacidade</Link>.</>} />
           <Checkbox checked={marketing} onChange={(e) => setMarketing(e.target.checked)} label="Quero receber novidades e ofertas por e-mail (opcional)." />
           {error && <Alert>{error}</Alert>}
           <div className="flex gap-2">
@@ -72,5 +74,6 @@ export function GoogleSection({ onSuccess, termsAccepted = false }: Props) {
         </>
       )}
     </div>
+    </GoogleOAuthProvider>
   )
 }

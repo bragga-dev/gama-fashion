@@ -11,6 +11,7 @@ import { cn } from '@/lib/cn'
 import { applyFieldErrors, formLevelMessage } from '@/lib/errors'
 import { formatDate, maskCardNumber, maskCpf, onlyDigits } from '@/lib/format'
 import { formatBRL } from '@/lib/money'
+import { safeExternalUrl } from '@/lib/safe-url'
 import { paymentService } from '@/services/order.service'
 import { PAID_STATUSES, type BillingType, type Payment } from '@/types/payment'
 import { useForm } from 'react-hook-form'
@@ -133,7 +134,7 @@ export default function OrderPaymentPage() {
               <div className="space-y-4 text-center">
                 <p className="font-bold">Boleto gerado</p>
                 <p className="text-sm text-brand-950/70">Vencimento em {formatDate(active.due_date)}.</p>
-                {active.bank_slip_url && <a href={active.bank_slip_url} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center gap-2 rounded-full bg-brand-700 px-6 text-sm font-semibold text-white hover:bg-brand-800"><ExternalLink className="size-4" /> Abrir boleto</a>}
+                {safeExternalUrl(active.bank_slip_url) && <a href={safeExternalUrl(active.bank_slip_url)!} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center gap-2 rounded-full bg-brand-700 px-6 text-sm font-semibold text-white hover:bg-brand-800"><ExternalLink className="size-4" /> Abrir boleto</a>}
               </div>
             )}
             {active.billing_type === 'CREDIT_CARD' && <Alert tone="info">Pagamento no cartão em análise ({active.status}). Esta página atualiza sozinha.</Alert>}

@@ -29,6 +29,8 @@ const ContactsAdminPage = lazy(() => import('@/pages/admin/ContactsAdminPage'))
 const UsersAdminPage = lazy(() => import('@/pages/admin/UsersAdminPage'))
 const AdminProfilePage = lazy(() => import('@/pages/admin/AdminProfilePage'))
 const NotificationsPageLazy = lazy(() => import('@/pages/account/NotificationsPage'))
+const TermsPage = lazy(() => import('@/pages/legal/TermsPage'))
+const PrivacyPage = lazy(() => import('@/pages/legal/PrivacyPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'))
@@ -53,6 +55,8 @@ export default function App() {
           <Route path="/comprar-mais" element={<Navigate to="/produtos?sort=recent" replace />} />
           <Route path="/carrinho" element={<CartPage />} />
           <Route path="/contato" element={<ContactPage />} />
+          <Route path="/termos" element={<TermsPage />} />
+          <Route path="/privacidade" element={<PrivacyPage />} />
 
           <Route path="/painel" element={<PanelIndex />} />
           <Route element={<RequireClient />}>

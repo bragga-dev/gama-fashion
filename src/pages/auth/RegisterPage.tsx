@@ -46,7 +46,7 @@ export default function RegisterPage() {
         <Input label="E-mail" type="email" autoComplete="email" error={errors.email?.message} {...register('email')} />
         <Input label="Senha" type="password" autoComplete="new-password" error={errors.password?.message} {...register('password')} />
         <Input label="Confirmar senha" type="password" autoComplete="new-password" error={errors.password2?.message} {...register('password2')} />
-        <Checkbox label="Li e aceito os Termos de Uso e a Política de Privacidade." error={errors.accepted_terms?.message} {...register('accepted_terms')} />
+        <Checkbox label={<>Li e aceito os <Link to="/termos" target="_blank" className="font-semibold text-brand-700 underline">Termos de Uso</Link> e a <Link to="/privacidade" target="_blank" className="font-semibold text-brand-700 underline">Política de Privacidade</Link>.</>} error={errors.accepted_terms?.message} {...register('accepted_terms')} />
         <Checkbox label="Quero receber novidades e ofertas por e-mail (opcional)." {...register('marketing_opt_in')} />
         {error && <Alert>{error}</Alert>}
         <Button type="submit" size="lg" className="w-full" loading={isSubmitting}>Criar conta</Button>

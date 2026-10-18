@@ -3,6 +3,7 @@ import { Bell, MapPin, Package, UserCog } from 'lucide-react'
 import { AnnouncementBar } from './AnnouncementBar'
 import { Header } from './Header'
 import { Footer } from './Footer'
+import { CookieNotice } from '@/components/CookieNotice'
 import { PageLoader } from '@/components/ui/misc'
 import { useAuth } from '@/contexts/AuthContext'
 import { cn } from '@/lib/cn'
@@ -14,6 +15,7 @@ export function MainLayout() {
       <Header />
       <main className="flex-1"><Outlet /></main>
       <Footer />
+      <CookieNotice />
     </div>
   )
 }
