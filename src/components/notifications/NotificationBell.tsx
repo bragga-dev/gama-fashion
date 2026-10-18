@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Bell, CheckCheck } from 'lucide-react'
 import { IconButton } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/misc'
+import { useAuth } from '@/contexts/AuthContext'
 import { useNotificationMutations, useNotifications, useUnreadCount } from '@/hooks/useAccount'
 import { timeAgo } from '@/lib/format'
 import { cn } from '@/lib/cn'
@@ -12,6 +13,7 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
+  const { isAdmin } = useAuth()
   const { data: unread = 0 } = useUnreadCount()
   const { data, isLoading } = useNotifications(1, 8, open)
   const { read, readAll } = useNotificationMutations()
@@ -66,7 +68,7 @@ export function NotificationBell() {
                 </button>
               ))}
           </div>
-          <Link to="/painel/notificacoes" onClick={() => setOpen(false)} className="block border-t border-brand-100 py-3 text-center text-sm font-semibold text-brand-700 hover:bg-brand-50">
+          <Link to={isAdmin ? '/painel/notificacoes-admin' : '/painel/notificacoes'} onClick={() => setOpen(false)} className="block border-t border-brand-100 py-3 text-center text-sm font-semibold text-brand-700 hover:bg-brand-50">
             Ver todas
           </Link>
         </div>

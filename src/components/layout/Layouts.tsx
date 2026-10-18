@@ -18,6 +18,26 @@ export function MainLayout() {
   )
 }
 
+/** Exige um papel específico; quem tem o papel errado vai para a sua própria área. */
+function RequireRole({ role }: { role: 'client' | 'admin' }) {
+  const { me, isLoading } = useAuth()
+  const location = useLocation()
+  if (isLoading) return <PageLoader />
+  if (!me) return <Navigate to="/entrar" replace state={{ from: location.pathname + location.search }} />
+  if (me.user.role !== role) return <Navigate to={me.user.role === 'admin' ? '/painel/dashboard' : '/'} replace />
+  return <Outlet />
+}
+export const RequireClient = () => <RequireRole role="client" />
+export const RequireAdmin = () => <RequireRole role="admin" />
+
+/** /painel → área correta conforme o papel. */
+export function PanelIndex() {
+  const { me, isLoading } = useAuth()
+  if (isLoading) return <PageLoader />
+  if (!me) return <Navigate to="/entrar" replace state={{ from: '/painel' }} />
+  return <Navigate to={me.user.role === 'admin' ? '/painel/dashboard' : '/painel/meus-pedidos'} replace />
+}
+
 /** Exige login. Guarda a rota de origem para voltar depois do login. */
 export function RequireAuth() {
   const { isAuthenticated, isLoading } = useAuth()

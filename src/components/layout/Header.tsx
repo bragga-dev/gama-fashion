@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, NavLink, useNavigate, useSearchParams } from 'react-router-dom'
-import { ChevronDown, Heart, LogOut, MapPin, Menu, Package, Search, ShoppingBag, User, UserCog, X } from 'lucide-react'
+import { ChevronDown, Heart, LayoutDashboard, LogOut, MapPin, Menu, Package, Search, ShoppingBag, User, UserCog, X } from 'lucide-react'
 import { IconButton, ButtonLink } from '@/components/ui/Button'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { Logo } from './Logo'
@@ -33,7 +33,7 @@ function SearchBar({ className, onDone }: { className?: string; onDone?: () => v
 }
 
 function AccountMenu() {
-  const { me, isAuthenticated, signOut } = useAuth()
+  const { me, isAuthenticated, isAdmin, signOut } = useAuth()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -71,9 +71,18 @@ function AccountMenu() {
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-60 rounded-3xl border border-brand-100 bg-white p-2 shadow-soft" onClick={() => setOpen(false)}>
           <p className="truncate px-4 py-2 text-xs text-brand-950/60">{me?.user.email}</p>
-          <Link to="/painel/meus-pedidos" className={item}><Package className="size-4 text-brand-600" /> Meus pedidos</Link>
-          <Link to="/painel/perfil" className={item}><UserCog className="size-4 text-brand-600" /> Meus dados</Link>
-          <Link to="/painel/enderecos" className={item}><MapPin className="size-4 text-brand-600" /> Endereços</Link>
+          {isAdmin ? (
+            <>
+              <Link to="/painel/dashboard" className={item}><LayoutDashboard className="size-4 text-brand-600" /> Painel administrativo</Link>
+              <Link to="/painel/meu-perfil" className={item}><UserCog className="size-4 text-brand-600" /> Meu perfil</Link>
+            </>
+          ) : (
+            <>
+              <Link to="/painel/meus-pedidos" className={item}><Package className="size-4 text-brand-600" /> Meus pedidos</Link>
+              <Link to="/painel/perfil" className={item}><UserCog className="size-4 text-brand-600" /> Meus dados</Link>
+              <Link to="/painel/enderecos" className={item}><MapPin className="size-4 text-brand-600" /> Endereços</Link>
+            </>
+          )}
           <button onClick={() => { void signOut().then(() => navigate('/')) }} className={cn(item, 'w-full text-left text-red-600')}>
             <LogOut className="size-4" /> Sair
           </button>
@@ -85,7 +94,7 @@ function AccountMenu() {
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { isAuthenticated, isClient } = useAuth()
+  const { isAuthenticated, isClient, isAdmin } = useAuth()
   const { data: cart } = useCart()
   const { data: categories } = useCategories()
   const count = cartCount(cart)
@@ -104,13 +113,13 @@ export function Header() {
         <div className="ml-auto flex items-center gap-1">
           <AccountMenu />
           {isAuthenticated && <NotificationBell />}
-          <Link to="/carrinho" aria-label="Carrinho" title="Carrinho"
+          {!isAdmin && <Link to="/carrinho" aria-label="Carrinho" title="Carrinho"
             className="relative inline-flex size-11 items-center justify-center rounded-full text-brand-900 transition-colors hover:bg-brand-100 active:scale-95">
             <ShoppingBag className="size-5" />
             {isClient && count > 0 && (
               <span className="absolute right-0.5 top-0.5 flex min-w-5 items-center justify-center rounded-full bg-brand-700 px-1 text-[10px] font-bold leading-5 text-white ring-2 ring-white">{count}</span>
             )}
-          </Link>
+          </Link>}
         </div>
       </div>
 

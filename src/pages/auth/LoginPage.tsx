@@ -16,15 +16,18 @@ const schema = z.object({ email: z.string().email('E-mail inválido'), password:
 type Values = z.infer<typeof schema>
 
 export default function LoginPage() {
-  const { signIn, isAuthenticated } = useAuth()
+  const { signIn, isAuthenticated, isAdmin } = useAuth()
   const navigate = useNavigate()
   const from = (useLocation().state as { from?: string } | null)?.from ?? '/'
   const [error, setError] = useState<string | null>(null)
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Values>({ resolver: zodResolver(schema) })
 
-  if (isAuthenticated) return <Navigate to={from} replace />
+  if (isAuthenticated) return <Navigate to={isAdmin && from === '/' ? '/painel/dashboard' : from} replace />
 
-  const done = async (access: string) => { await signIn(access); navigate(from, { replace: true }) }
+  const done = async (access: string) => {
+    const me = await signIn(access)
+    navigate(me.user.role === 'admin' && from === '/' ? '/painel/dashboard' : from, { replace: true })
+  }
   const submit = handleSubmit(async (v) => {
     setError(null)
     try { await done((await authService.login(v)).access) } catch (e) { setError(getErrorMessage(e)) }
