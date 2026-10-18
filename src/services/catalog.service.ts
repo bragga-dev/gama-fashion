@@ -10,10 +10,10 @@ function clean<T extends object>(params: T) {
 
 export const catalogService = {
   listProducts: (filters: ProductFilters = {}) =>
-    api.get<Page<ProductListItem>>('/products', { params: clean(filters) }).then((r) => r.data),
+    api.get<Page<ProductListItem>>('/products/', { params: clean(filters) }).then((r) => r.data),
   getProduct: (id: string) => api.get<Product>(`/products/${id}`).then((r) => r.data),
   listCategories: () =>
-    api.get<Page<Category>>('/categories', { params: { page_size: 50 } }).then((r) => r.data.items),
+    api.get<Page<Category>>('/categories/', { params: { page_size: 50 } }).then((r) => r.data.items),
   quoteVariantShipping: (variantId: string, recipient_cep: string, quantity?: number) =>
     api.post<ShippingOption[]>(`/shipping/quote/${variantId}`, { recipient_cep, quantity }).then((r) => r.data),
 }
@@ -24,7 +24,7 @@ export const reviewService = {
     api.get<RatingSummary>(`/reviews/products/${productId}/summary`).then((r) => r.data),
   mine: () => api.get<Array<{ order_item: { order_item_id: string } }>>('/reviews/me').then((r) => r.data),
   create: (body: { order_item_id: string; reviews: number; comment?: string }) =>
-    api.post('/reviews', body).then((r) => r.data),
+    api.post('/reviews/', body).then((r) => r.data),
 }
 
 export const campaignService = {
@@ -33,5 +33,5 @@ export const campaignService = {
 }
 
 export const contactService = {
-  send: (body: ContactIn) => api.post('/contact', body).then((r) => r.data),
+  send: (body: ContactIn) => api.post('/contact/', body).then((r) => r.data),
 }

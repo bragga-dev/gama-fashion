@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ImageIcon, Pencil, Plus, Power, Star, Trash2 } from 'lucide-react'
+import { ImageIcon, Pencil, Plus, Power, Star, Trash2, X } from 'lucide-react'
 import { Card, Modal, PageHeader, Pill } from '@/components/admin/AdminUI'
 import { Button, IconButton } from '@/components/ui/Button'
 import { Input, Textarea } from '@/components/ui/Field'
@@ -17,10 +17,16 @@ const toIso = (v: string) => (v ? new Date(v).toISOString() : null)
 function CampaignForm({ campaign, onClose }: { campaign: Campaign | null; onClose: () => void }) {
   const qc = useQueryClient()
   const [f, setF] = useState({ title: campaign?.title ?? '', description: campaign?.description ?? '', starts: toLocal(campaign?.starts_at), ends: toLocal(campaign?.ends_at) })
+  const [files, setFiles] = useState<File[]>([])
+  const [cover, setCover] = useState(0)
+  const previews = files.map((file) => URL.createObjectURL(file))
   const save = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       const body = { title: f.title.trim(), description: f.description || null, starts_at: toIso(f.starts), ends_at: toIso(f.ends) }
-      return campaign ? adminCampaigns.update(campaign.campaign_id, body) : adminCampaigns.create(body)
+      if (campaign) return adminCampaigns.update(campaign.campaign_id, body)
+      const created = await adminCampaigns.create(body)
+      for (let i = 0; i < files.length; i++) await adminCampaigns.uploadImage(created.campaign_id, files[i], i === cover)
+      return created
     },
     onSuccess: () => { void qc.invalidateQueries({ queryKey: ['admin', 'campaigns'] }); void qc.invalidateQueries({ queryKey: ['campaigns'] }); onClose() },
   })
@@ -31,6 +37,21 @@ function CampaignForm({ campaign, onClose }: { campaign: Campaign | null; onClos
         <Textarea className="sm:col-span-2" label="Descrição" value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} />
         <Input label="Início" type="datetime-local" value={f.starts} onChange={(e) => setF({ ...f, starts: e.target.value })} />
         <Input label="Fim" type="datetime-local" value={f.ends} onChange={(e) => setF({ ...f, ends: e.target.value })} />
+        {!campaign && (
+          <div className="space-y-3 sm:col-span-2">
+            <p className="ml-2 text-sm font-medium text-brand-900">Imagens do banner</p>
+            <input type="file" accept="image/*" multiple onChange={(e) => { setFiles(Array.from(e.target.files ?? [])); setCover(0) }}
+              className="block w-full text-sm file:mr-4 file:rounded-full file:border-0 file:bg-brand-100 file:px-5 file:py-2.5 file:font-semibold file:text-brand-800 hover:file:bg-brand-200" />
+            <p className="ml-2 text-xs text-brand-950/60">Use imagens em paisagem (ideal 2560×1080). A estrela marca a capa (1º slide).</p>
+            {files.length > 0 && (
+              <ul className="flex flex-wrap gap-3">{previews.map((src, i) => (
+                <li key={src} className={cn('relative aspect-video w-32 overflow-hidden rounded-2xl border-2', i === cover ? 'border-brand-700' : 'border-brand-100')}>
+                  <img src={src} alt="" className="size-full object-cover" />
+                  <button type="button" aria-label="Definir como capa" onClick={() => setCover(i)} className={cn('absolute left-1 top-1 flex size-7 items-center justify-center rounded-full', i === cover ? 'bg-brand-700 text-white' : 'bg-white/90 text-brand-700')}><Star className="size-3.5" /></button>
+                  <button type="button" aria-label="Remover" onClick={() => { setFiles(files.filter((_, n) => n !== i)); setCover(0) }} className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-full bg-white/90 text-red-600"><X className="size-3.5" /></button>
+                </li>))}</ul>)}
+          </div>
+        )}
         {save.error && <Alert className="sm:col-span-2">{getErrorMessage(save.error)}</Alert>}
         <div className="flex gap-2 sm:col-span-2"><Button disabled={f.title.trim().length < 2} loading={save.isPending} onClick={() => save.mutate()}>Salvar</Button><Button variant="ghost" onClick={onClose}>Cancelar</Button></div>
       </div>

@@ -3,8 +3,8 @@ import type { Order, OrderCreateIn } from '@/types/order'
 import type { Payment, PaymentCreateIn } from '@/types/payment'
 
 export const orderService = {
-  create: (body: OrderCreateIn) => api.post<Order>('/orders', body).then((r) => r.data),
-  list: () => api.get<Order[]>('/orders').then((r) => r.data),
+  create: (body: OrderCreateIn) => api.post<Order>('/orders/', body).then((r) => r.data),
+  list: () => api.get<Order[]>('/orders/').then((r) => r.data),
   get: (id: string) => api.get<Order>(`/orders/${id}`).then((r) => r.data),
   cancel: (id: string, reason?: string) => api.post<Order>(`/orders/${id}/cancel`, { reason }).then((r) => r.data),
 }

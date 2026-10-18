@@ -60,8 +60,8 @@ export const adminProducts = {
 }
 
 export const adminCategories = {
-  list: () => api.get<Page<Category>>('/categories', { params: { page_size: 100, active_only: false } }).then((r) => r.data.items),
-  create: (category_name: string) => api.post<Category>('/categories', { category_name }).then((r) => r.data),
+  list: () => api.get<Page<Category>>('/categories/', { params: { page_size: 100, active_only: false } }).then((r) => r.data.items),
+  create: (category_name: string) => api.post<Category>('/categories/', { category_name }).then((r) => r.data),
   update: (id: string, body: { category_name?: string; is_active?: boolean }) => api.patch<Category>(`/categories/${id}`, body).then((r) => r.data),
   remove: (id: string) => api.delete<Message>(`/categories/${id}`).then((r) => r.data),
   uploadImage: (id: string, image: File) => api.post<Category>(`/categories/${id}/image`, form({ image })).then((r) => r.data),
@@ -76,8 +76,8 @@ export const adminReviews = {
 }
 
 export const adminCampaigns = {
-  list: () => api.get<Page<Campaign>>('/campaigns', { params: { page_size: 100, active_only: false } }).then((r) => r.data.items),
-  create: (body: CampaignInput) => api.post<Campaign>('/campaigns', body).then((r) => r.data),
+  list: () => api.get<Page<Campaign>>('/campaigns/', { params: { page_size: 100, active_only: false } }).then((r) => r.data.items),
+  create: (body: CampaignInput) => api.post<Campaign>('/campaigns/', body).then((r) => r.data),
   update: (id: string, body: Partial<CampaignInput> & { is_active?: boolean }) => api.patch<Campaign>(`/campaigns/${id}`, body).then((r) => r.data),
   remove: (id: string) => api.delete<Message>(`/campaigns/${id}`).then((r) => r.data),
   setActive: (id: string, active: boolean) => api.post<Campaign>(`/campaigns/${id}/${active ? 'activate' : 'deactivate'}`).then((r) => r.data),
@@ -90,7 +90,7 @@ export const adminCampaigns = {
 
 export const adminContacts = {
   list: (params: { page?: number; page_size?: number; status?: ContactStatus; search?: string }) =>
-    api.get<Page<Contact>>('/contact', { params: clean(params) }).then((r) => r.data),
+    api.get<Page<Contact>>('/contact/', { params: clean(params) }).then((r) => r.data),
   setStatus: (id: string, status: ContactStatus) => api.patch<Contact>(`/contact/${id}`, { status }).then((r) => r.data),
   remove: (id: string) => api.delete<Message>(`/contact/${id}`).then((r) => r.data),
 }
