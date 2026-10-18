@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Search, Trash2 } from 'lucide-react'
 import { Card, PageHeader, Pill } from '@/components/admin/AdminUI'
@@ -14,6 +15,7 @@ import type { ContactStatus } from '@/types/admin'
 const TONE = { pending: 'amber', in_progress: 'blue', resolved: 'green', archived: 'gray' } as const
 
 export default function ContactsAdminPage() {
+  const confirm = useConfirm()
   const qc = useQueryClient()
   const [page, setPage] = useState(1)
   const [status, setStatus] = useState('')
@@ -53,7 +55,7 @@ export default function ContactsAdminPage() {
                   <div className="flex items-center gap-2">
                     <Select aria-label="Alterar status" value={c.status} onChange={(e) => setStat.mutate({ id: c.contact_id, s: e.target.value as ContactStatus })}>
                       <option value="pending">Pendente</option><option value="in_progress">Em andamento</option><option value="resolved">Resolvida</option><option value="archived">Arquivada</option></Select>
-                    <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={() => { if (confirm('Excluir esta mensagem?')) remove.mutate(c.contact_id) }}><Trash2 className="size-4" /></IconButton>
+                    <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={async () => { if (await confirm('Excluir esta mensagem?')) remove.mutate(c.contact_id) }}><Trash2 className="size-4" /></IconButton>
                   </div>
                 </div>
               </Card></li>))}</ul>)}

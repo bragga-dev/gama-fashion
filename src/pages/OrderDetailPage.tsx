@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronLeft, Star } from 'lucide-react'
@@ -45,6 +46,7 @@ function ReviewBox({ orderItemId, reviewed }: { orderItemId: string; reviewed: b
 }
 
 export default function OrderDetailPage() {
+  const confirm = useConfirm()
   const { id } = useParams()
   const qc = useQueryClient()
   const { data: order, isLoading, error } = useOrder(id)
@@ -106,7 +108,7 @@ export default function OrderDetailPage() {
       {order.order_status === 'PENDING' && (
         <div className="flex flex-wrap gap-3">
           <ButtonLink to={`/pedido/${order.order_id}/pagamento`} size="lg">Pagar agora</ButtonLink>
-          <Button size="lg" variant="outline" loading={cancel.isPending} onClick={() => { if (confirm('Cancelar este pedido? O estoque será devolvido.')) cancel.mutate() }}>Cancelar pedido</Button>
+          <Button size="lg" variant="outline" loading={cancel.isPending} onClick={async () => { if (await confirm('Cancelar este pedido? O estoque será devolvido.')) cancel.mutate() }}>Cancelar pedido</Button>
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { Link } from 'react-router-dom'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ImageOff, Pencil, Plus, Power, Search, Trash2 } from 'lucide-react'
@@ -14,6 +15,7 @@ import { formatBRL } from '@/lib/money'
 import { adminProducts } from '@/services/admin.service'
 
 export default function ProductsAdminPage() {
+  const confirm = useConfirm()
   const qc = useQueryClient()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -67,7 +69,7 @@ export default function ProductsAdminPage() {
                 <td className={td}><div className="flex justify-end gap-1">
                   <Link to={`/painel/produtos/${p.product_id}`} aria-label="Editar" className="flex size-10 items-center justify-center rounded-full hover:bg-brand-100"><Pencil className="size-4" /></Link>
                   <IconButton label={p.is_active ? 'Desativar' : 'Ativar'} onClick={() => toggle.mutate({ id: p.product_id, active: !p.is_active })}><Power className="size-4" /></IconButton>
-                  <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={() => { if (confirm(`Excluir "${p.product_name}"? Esta ação não pode ser desfeita.`)) remove.mutate(p.product_id) }}><Trash2 className="size-4" /></IconButton></div></td>
+                  <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={async () => { if (await confirm(`Excluir "${p.product_name}"? Esta ação não pode ser desfeita.`)) remove.mutate(p.product_id) }}><Trash2 className="size-4" /></IconButton></div></td>
               </tr>))}
           </Table>
           {data && <Pagination page={data.page} pages={data.pages} onChange={setPage} />}

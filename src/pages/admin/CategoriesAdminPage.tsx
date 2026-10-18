@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Camera, Pencil, Plus, Power, Shirt, Trash2 } from 'lucide-react'
 import { Modal, PageHeader, Pill, Table, td } from '@/components/admin/AdminUI'
@@ -10,6 +11,7 @@ import { adminCategories } from '@/services/admin.service'
 import type { Category } from '@/types/product'
 
 export default function CategoriesAdminPage() {
+  const confirm = useConfirm()
   const qc = useQueryClient()
   const { data, isLoading } = useQuery({ queryKey: ['admin', 'categories'], queryFn: adminCategories.list })
   const [editing, setEditing] = useState<Category | 'new' | null>(null)
@@ -45,7 +47,7 @@ export default function CategoriesAdminPage() {
               {c.category_image_url && <IconButton label="Remover imagem" onClick={() => rmImage.mutate(c.product_category_id)}><Trash2 className="size-4 text-brand-400" /></IconButton>}
               <IconButton label="Renomear" onClick={() => { setName(c.category_name); setEditing(c) }}><Pencil className="size-4" /></IconButton>
               <IconButton label={c.is_active ? 'Desativar' : 'Ativar'} onClick={() => toggle.mutate(c)}><Power className="size-4" /></IconButton>
-              <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={() => { if (confirm(`Excluir "${c.category_name}"? Só é possível sem produtos vinculados.`)) remove.mutate(c.product_category_id) }}><Trash2 className="size-4" /></IconButton></div></td>
+              <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={async () => { if (await confirm(`Excluir "${c.category_name}"? Só é possível sem produtos vinculados.`)) remove.mutate(c.product_category_id) }}><Trash2 className="size-4" /></IconButton></div></td>
           </tr>))}
       </Table>
       <Modal open={!!editing} title={editing === 'new' ? 'Nova categoria' : 'Renomear categoria'} onClose={() => setEditing(null)}>

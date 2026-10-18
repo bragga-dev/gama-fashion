@@ -11,7 +11,7 @@ export function Footer() {
     <footer className="mt-20 rounded-t-[2.5rem] bg-brand-950 text-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-4">
-          <Logo light />
+          <Logo light imgClassName="h-14 sm:h-14" />
           <p className="max-w-xs text-sm text-brand-200">Moda fitness masculina e feminina com conforto, estilo e performance para o seu treino e o seu dia a dia.</p>
           <div className="flex gap-2">
             {env.whatsapp && (

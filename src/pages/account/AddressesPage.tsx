@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { MapPin, Plus, Star, Trash2 } from 'lucide-react'
 import { AddressForm } from '@/components/AddressForm'
 import { Button } from '@/components/ui/Button'
@@ -7,6 +8,7 @@ import { useAddressMutations, useAddresses } from '@/hooks/useAccount'
 import { getErrorMessage } from '@/lib/errors'
 
 export default function AddressesPage() {
+  const confirm = useConfirm()
   const { data: addresses, isLoading } = useAddresses()
   const { create, update, remove, setPreferential } = useAddressMutations()
   const [mode, setMode] = useState<'list' | 'new' | string>('list')
@@ -43,7 +45,7 @@ export default function AddressesPage() {
                   <div className="flex flex-wrap gap-2">
                     <Button size="sm" variant="secondary" onClick={() => setMode(a.address_id)}>Editar</Button>
                     {!a.is_preferential && <Button size="sm" variant="ghost" onClick={() => setPreferential.mutate(a.address_id)}><Star className="size-4" /> Tornar preferencial</Button>}
-                    <Button size="sm" variant="ghost" className="text-red-600 hover:bg-red-50" onClick={() => { if (confirm('Excluir este endereço?')) remove.mutate(a.address_id) }}><Trash2 className="size-4" /> Excluir</Button>
+                    <Button size="sm" variant="ghost" className="text-red-600 hover:bg-red-50" onClick={async () => { if (await confirm('Excluir este endereço?')) remove.mutate(a.address_id) }}><Trash2 className="size-4" /> Excluir</Button>
                   </div>
                 </>
               )}

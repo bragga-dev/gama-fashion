@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft, Package, Pencil, Plus, Power, Star, Trash2, Truck } from 'lucide-react'
@@ -96,6 +97,7 @@ function ShippingModal({ variant, onClose }: { variant: Variant; onClose: () => 
 }
 
 function VariantsTab({ id }: { id: string }) {
+  const confirm = useConfirm()
   const qc = useQueryClient()
   const { data, isLoading } = useQuery({ queryKey: ['admin', 'variants', id], queryFn: () => adminProducts.variants(id) })
   const [editing, setEditing] = useState<Variant | 'new' | null>(null)
@@ -119,7 +121,7 @@ function VariantsTab({ id }: { id: string }) {
               <IconButton label="Editar" onClick={() => setEditing(v)}><Pencil className="size-4" /></IconButton>
               <IconButton label="Frete" onClick={() => setShipping(v)}><Truck className="size-4" /></IconButton>
               <IconButton label={v.is_active ? 'Desativar' : 'Ativar'} onClick={() => toggle.mutate(v)}><Power className="size-4" /></IconButton>
-              <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={() => { if (confirm('Excluir esta variante?')) remove.mutate(v.variant_id) }}><Trash2 className="size-4" /></IconButton></div></td>
+              <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={async () => { if (await confirm('Excluir esta variante?')) remove.mutate(v.variant_id) }}><Trash2 className="size-4" /></IconButton></div></td>
           </tr>))}
       </Table>
       {editing && <VariantModal productId={id} variant={editing === 'new' ? null : editing} onClose={() => setEditing(null)} />}
@@ -129,6 +131,7 @@ function VariantsTab({ id }: { id: string }) {
 }
 
 function ImagesTab({ id }: { id: string }) {
+  const confirm = useConfirm()
   const qc = useQueryClient()
   const { data: p, isLoading } = useQuery({ queryKey: ['admin', 'product', id], queryFn: () => adminProducts.get(id) })
   const refresh = () => { void qc.invalidateQueries({ queryKey: ['admin'] }) }
@@ -150,7 +153,7 @@ function ImagesTab({ id }: { id: string }) {
             {img.is_cover && <span className="absolute left-2 top-2"><Pill>Capa</Pill></span>}
             <div className="absolute inset-x-2 bottom-2 flex justify-between">
               <button aria-label="Definir como capa" title="Definir como capa" onClick={() => cover.mutate(img.image_id)} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-brand-700 shadow-card"><Star className="size-4" /></button>
-              <button aria-label="Excluir foto" onClick={() => { if (confirm('Excluir esta foto?')) remove.mutate(img.image_id) }} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-red-600 shadow-card"><Trash2 className="size-4" /></button>
+              <button aria-label="Excluir foto" onClick={async () => { if (await confirm('Excluir esta foto?')) remove.mutate(img.image_id) }} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-red-600 shadow-card"><Trash2 className="size-4" /></button>
             </div>
           </li>))}</ul>)}
     </Card>

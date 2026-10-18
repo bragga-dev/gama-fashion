@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ImageIcon, Pencil, Plus, Power, Star, Trash2, X } from 'lucide-react'
 import { Card, Modal, PageHeader, Pill } from '@/components/admin/AdminUI'
@@ -62,6 +63,7 @@ function CampaignForm({ campaign, onClose }: { campaign: Campaign | null; onClos
 function ImagesModal({ campaign, onClose }: { campaign: Campaign; onClose: () => void }) {
   const qc = useQueryClient()
   const id = campaign.campaign_id
+  const confirm = useConfirm()
   const { data, isLoading } = useQuery({ queryKey: ['admin', 'campaign-images', id], queryFn: () => adminCampaigns.images(id) })
   const refresh = () => { void qc.invalidateQueries({ queryKey: ['admin', 'campaign-images', id] }); void qc.invalidateQueries({ queryKey: ['campaigns'] }) }
   const upload = useMutation({ mutationFn: async (files: File[]) => { for (const f of files) await adminCampaigns.uploadImage(id, f, !data?.length && f === files[0]) }, onSuccess: refresh })
@@ -81,7 +83,7 @@ function ImagesModal({ campaign, onClose }: { campaign: Campaign; onClose: () =>
               {img.is_cover && <span className="absolute left-2 top-2"><Pill>Capa</Pill></span>}
               <div className="absolute inset-x-2 bottom-2 flex justify-between">
                 <button aria-label="Definir como capa" onClick={() => cover.mutate(img.campaign_mage_id)} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-brand-700 shadow-card"><Star className="size-4" /></button>
-                <button aria-label="Excluir" onClick={() => { if (confirm('Excluir esta imagem?')) remove.mutate(img.campaign_mage_id) }} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-red-600 shadow-card"><Trash2 className="size-4" /></button>
+                <button aria-label="Excluir" onClick={async () => { if (await confirm('Excluir esta imagem?')) remove.mutate(img.campaign_mage_id) }} className="flex size-9 items-center justify-center rounded-full bg-white/95 text-red-600 shadow-card"><Trash2 className="size-4" /></button>
               </div>
             </li>))}</ul>)}
       </div>
@@ -90,6 +92,7 @@ function ImagesModal({ campaign, onClose }: { campaign: Campaign; onClose: () =>
 }
 
 export default function CampaignsAdminPage() {
+  const confirm = useConfirm()
   const qc = useQueryClient()
   const { data, isLoading } = useQuery({ queryKey: ['admin', 'campaigns'], queryFn: adminCampaigns.list })
   const [form, setForm] = useState<Campaign | 'new' | null>(null)
@@ -114,7 +117,7 @@ export default function CampaignsAdminPage() {
               <IconButton label="Imagens" onClick={() => setImages(c)}><ImageIcon className="size-4" /></IconButton>
               <IconButton label="Editar" onClick={() => setForm(c)}><Pencil className="size-4" /></IconButton>
               <IconButton label={c.is_active ? 'Desativar' : 'Ativar'} onClick={() => toggle.mutate(c)}><Power className="size-4" /></IconButton>
-              <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={() => { if (confirm(`Excluir "${c.title}"?`)) remove.mutate(c.campaign_id) }}><Trash2 className="size-4" /></IconButton>
+              <IconButton label="Excluir" className="text-red-600 hover:bg-red-50" onClick={async () => { if (await confirm(`Excluir "${c.title}"?`)) remove.mutate(c.campaign_id) }}><Trash2 className="size-4" /></IconButton>
             </div></Card></li>))}</ul>)}
       {form && <CampaignForm campaign={form === 'new' ? null : form} onClose={() => setForm(null)} />}
       {images && <ImagesModal campaign={images} onClose={() => setImages(null)} />}

@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft, ExternalLink, PackageCheck, Tag } from 'lucide-react'
 import { Card, Pill, orderTone, PageHeader } from '@/components/admin/AdminUI'
@@ -13,6 +14,7 @@ import { adminOrders } from '@/services/admin.service'
 
 export default function OrderAdminDetailPage() {
   const { id = '' } = useParams()
+  const confirm = useConfirm()
   const qc = useQueryClient()
   const { data: o, isLoading } = useQuery({ queryKey: ['admin', 'order', id], queryFn: () => adminOrders.get(id) })
   const refresh = () => { void qc.invalidateQueries({ queryKey: ['admin'] }) }
@@ -62,9 +64,9 @@ export default function OrderAdminDetailPage() {
           </Card>
           <Card className="space-y-3"><h2 className="font-bold">Ações</h2>
             <Button className="w-full" disabled={!paid || o.shipping_status !== 'pending'} loading={label.isPending}
-              onClick={() => { if (confirm('Gerar etiqueta na Frenet? O valor será debitado do saldo da carteira.')) label.mutate() }}><Tag className="size-4" /> Gerar etiqueta</Button>
+              onClick={async () => { if (await confirm('Gerar etiqueta na Frenet? O valor será debitado do saldo da carteira.')) label.mutate() }}><Tag className="size-4" /> Gerar etiqueta</Button>
             <Button className="w-full" variant="secondary" disabled={!paid || o.shipping_status === 'delivered'} loading={delivered.isPending}
-              onClick={() => { if (confirm('Marcar como entregue?')) delivered.mutate() }}><PackageCheck className="size-4" /> Marcar como entregue</Button>
+              onClick={async () => { if (await confirm('Marcar como entregue?')) delivered.mutate() }}><PackageCheck className="size-4" /> Marcar como entregue</Button>
             {o.canceled_reason && <p className="text-xs text-brand-950/60">Cancelado: {o.canceled_reason}</p>}
           </Card>
         </div>

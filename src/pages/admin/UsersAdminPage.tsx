@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Power, Search } from 'lucide-react'
 import { PageHeader, Pill, Table, td } from '@/components/admin/AdminUI'
@@ -12,6 +13,7 @@ import { formatDate } from '@/lib/format'
 import { adminUsers } from '@/services/admin.service'
 
 export default function UsersAdminPage() {
+  const confirm = useConfirm()
   const qc = useQueryClient()
   const { me } = useAuth()
   const [page, setPage] = useState(1)
@@ -47,7 +49,7 @@ export default function UsersAdminPage() {
                 <td className={td}>{formatDate(u.date_joined)}</td>
                 <td className={td}><Pill tone={u.is_active ? 'green' : 'red'}>{u.is_active ? 'Ativo' : 'Inativo'}</Pill></td>
                 <td className={td}>{u.user_id !== me?.user.user_id && (
-                  <div className="flex justify-end"><IconButton label={u.is_active ? 'Desativar usuário' : 'Reativar usuário'} onClick={() => { if (confirm(u.is_active ? `Desativar ${u.email}?` : `Reativar ${u.email}?`)) toggle.mutate({ id: u.user_id, active: !u.is_active }) }}><Power className="size-4" /></IconButton></div>)}</td>
+                  <div className="flex justify-end"><IconButton label={u.is_active ? 'Desativar usuário' : 'Reativar usuário'} onClick={async () => { if (await confirm(u.is_active ? `Desativar ${u.email}?` : `Reativar ${u.email}?`)) toggle.mutate({ id: u.user_id, active: !u.is_active }) }}><Power className="size-4" /></IconButton></div>)}</td>
               </tr>))}
           </Table>
           {data && <Pagination page={data.page} pages={data.pages} onChange={setPage} />}
