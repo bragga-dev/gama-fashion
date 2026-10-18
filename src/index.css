@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+/* Paleta derivada dos templates de e-mail (roxo #2d0f3a / #3a1348 / #6b2d83 + branco) */
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --color-brand-50: #f8f2fb;
+  --color-brand-100: #f0e3f6;
+  --color-brand-200: #e1c8ed;
+  --color-brand-300: #cda1df;
+  --color-brand-400: #b373cd;
+  --color-brand-500: #9a4fb5;
+  --color-brand-600: #833a9d;
+  --color-brand-700: #6b2d83;
+  --color-brand-800: #521f66;
+  --color-brand-900: #3a1348;
+  --color-brand-950: #2d0f3a;
+
+  --shadow-soft: 0 8px 30px -12px rgb(45 15 58 / 0.25);
+  --shadow-card: 0 2px 14px -4px rgb(45 15 58 / 0.14);
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply bg-white font-sans text-brand-950 antialiased; }
+  h1, h2, h3, h4 { @apply font-bold tracking-tight; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-brand-600; }
+  ::selection { @apply bg-brand-200 text-brand-950; }
+}
+
+@layer utilities {
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+}
+
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@utility animate-fade { animation: fade 0.4s ease both; }
